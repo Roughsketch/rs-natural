@@ -38,7 +38,7 @@ impl<'a> NGram<'a> {
     
     //right-padding
     if let Some(pad) = self.pad {
-      for i in 1..self.n {
+      for num_blanks in 1..self.n {
         let num_tokens = self.n - num_blanks;
         let last_entry = tokenized_sequence.len();
         let mut tc = Vec::new();
