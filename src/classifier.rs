@@ -36,7 +36,6 @@ impl NaiveBayesClassifier {
 
     for (classification, word_counts) in self.documents.iter() {
       //Get the probability that the passed-in text is each class
-      let mut normalized_prob = 0.0;
       let mut probability = 0.0f32;
       for stemmed_word in &stemmed_and_tokenized {
         if word_counts.contains_key(stemmed_word) {
@@ -45,12 +44,13 @@ impl NaiveBayesClassifier {
       }
 
       // store the calculated probability for the classification
-      if probability.abs() < 0.0001 {
-        normalized_prob = 0.0;
+      let normalized_prob = if probability.abs() < 0.0001 {
+        0.0
       } else {
-        normalized_prob = word_counts.len() as f32 * probability.abs() /
-                          self.total_document_count as f32;
-      }
+        word_counts.len() as f32 * probability.abs() /
+          self.total_document_count as f32
+      };
+      
       if result_probability <= normalized_prob {
         result_probability = normalized_prob;
         result_label = classification.clone();
