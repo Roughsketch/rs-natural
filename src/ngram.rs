@@ -3,7 +3,7 @@ use tokenize::tokenize;
 struct NGram<'a> {
   text: &'a str,
   n: usize,
-  pad: &'a str
+  pad: Option<&'a str>
 }
 
 impl<'a> NGram<'a> {
@@ -16,12 +16,12 @@ impl<'a> NGram<'a> {
     let mut ngram_result = Vec::new();
     
     //left-padding
-    if !self.pad.is_empty() {
+    if let Some(pad) = self.pad {
       for i in 1..self.n {
         let num_blanks = self.n - i;
         let mut this_sequence = Vec::new();
         for _ in 0..num_blanks {
-          this_sequence.push(self.pad);
+          this_sequence.push(pad);
         }
         let sl = &tokenized_sequence[0 .. (self.n - num_blanks)];
         this_sequence.extend_from_slice(sl);
@@ -37,14 +37,14 @@ impl<'a> NGram<'a> {
     }
     
     //right-padding
-    if !self.pad.is_empty() {
-      for num_blanks in 1..self.n {
+    if let Some(pad) = self.pad {
+      for i in 1..self.n {
         let num_tokens = self.n - num_blanks;
         let last_entry = tokenized_sequence.len();
         let mut tc = Vec::new();
         tc.extend_from_slice(&tokenized_sequence[(last_entry - num_tokens) .. last_entry]);
         for _ in 0..num_blanks {
-          tc.push(self.pad);
+          tc.push(pad);
         }
         ngram_result.push(tc);
       }
@@ -54,11 +54,11 @@ impl<'a> NGram<'a> {
 }
 
 pub fn get_ngram<'a>(this_text: &'a str, this_n: usize) -> Vec<Vec<&'a str>> {
-  let ng = NGram { text: this_text, n: this_n, pad: "" };
+  let ng = NGram { text: this_text, n: this_n, pad: None };
   ng.calculate()
 }
 
 pub fn get_ngram_with_padding<'a>(this_text: &'a str, this_n: usize, this_padding: &'a str) -> Vec<Vec<&'a str>> {
-  let ng = NGram { text: this_text, n: this_n, pad: this_padding };
+  let ng = NGram { text: this_text, n: this_n, pad: Some(this_padding) };
   ng.calculate()
 }
